@@ -22,7 +22,8 @@ Note **The pipelines that handle merging CDC events to target tables are develop
 Authenticate to workspace where the library need to be deployed.
 
 ```sh
-databricks auth login --host <workspace_url>
+PROFILE=dev
+databricks auth login --host <workspace_url> -p ${PROFILE}
 ```
 
 Create deployment volume in the root catalog for the environment. This must be done by user who has all privilleges on the catalog.
@@ -34,15 +35,10 @@ databricks volumes create <CATALOG_NAME> default libraries MANAGED
 Run the following command to build the jar and deploy to Databricks workspace
 
 ```sh
-sh ./make-databricks -c <CATALOG_NAME> -p <CLI-PROFILE>
-```
-
-### Apache Spark
-
-Run the following command in your DBFS to build the jar and deploy to designated path
-
-```sh
-sh ./make-spark -c <CATALOG_NAME> -p <CLI-PROFILE>
+TAG=2.1.4-1.2.2
+CATALOG=dev
+PROFILE=dev
+databricks fs cp ./target/justmodeling-pitcrew-cdc-${TAG}-jar-with-dependencies.jar dbfs:/Volumes/${CATALOG}/default/libraries/justmodeling-pitcrew-cdc-0.1.0-jar-with-dependencies.jar --overwrite -p ${PROFILE}
 ```
 
 ## Usage
@@ -77,6 +73,20 @@ Simply run the JAR file with configuration file, called config.ini
 ```bash
 java com.justmodeling.pitcrewcdc.databricks.MSSQLChangeCapture config.ini
 ```
+
+Optionally, instead of hard code the catalog or credentials, you can leverage Databricks secret vault to 
+pass values to the config.ini. If you have "my_username" stored in secret vault under scope "mysecret", configure 
+the config.ini like below:
+
+database.user=SECRET|mysecret|my_username
+
+this instructs the engine to lookup secret called "my_username" under scope "mysecret". Similary you can inject environment
+variables in a similar way
+
+cdc.persist.catalog=ENV|catalog_name|us_dev
+
+this instructe the gine to lookup environment vars called "catalog_name", if it cannot find one, default it to the value "us_dev"
+
 
 ## Connectors
 
