@@ -32,13 +32,13 @@ Create deployment volume in the root catalog for the environment. This must be d
 databricks volumes create <CATALOG_NAME> default libraries MANAGED
 ```
 
-Run the following command to build the jar and deploy to Databricks workspace
+Download the jar and run the following command to deploy the jar to Databricks workspace
 
 ```sh
 TAG=2.1.4-1.2.2
 CATALOG=dev
 PROFILE=dev
-databricks fs cp ./target/justmodeling-pitcrew-cdc-${TAG}-jar-with-dependencies.jar dbfs:/Volumes/${CATALOG}/default/libraries/justmodeling-pitcrew-cdc-0.1.0-jar-with-dependencies.jar --overwrite -p ${PROFILE}
+databricks fs cp justmodeling-pitcrew-cdc-${TAG}-jar-with-dependencies.jar dbfs:/Volumes/${CATALOG}/default/libraries/justmodeling-pitcrew-cdc-0.1.0-jar-with-dependencies.jar --overwrite -p ${PROFILE}
 ```
 
 ## Usage
